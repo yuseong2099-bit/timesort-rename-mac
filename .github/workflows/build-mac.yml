@@ -1,0 +1,29 @@
+name: build-mac
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install PyInstaller
+        run: python3 -m pip install --upgrade pip pyinstaller
+
+      - name: Build app
+        run: |
+          pyinstaller --windowed --name "TimeSortRename" --onefile rename_by_time_gui.py
+          ditto -c -k --sequesterRsrc --keepParent "dist/TimeSortRename.app" "TimeSortRename-mac.zip"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TimeSortRename-mac
+          path: TimeSortRename-mac.zip
